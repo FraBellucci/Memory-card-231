@@ -244,7 +244,7 @@
             
            <div class="stats">
     <div class="stat-box">Mosse: <span id="moves">0</span></div>
-    <div class="stat-box">Coppie trovate: <span id="pairs">0</span>/9</div>
+    <div class="stat-box">Coppie trovate: <span id="pairs">0</span>/7</div>
     <button class="reset-btn" onclick="resetGame()">🔄 Nuova Partita</button>
     <button class="reset-btn" onclick="window.close()" style="background: #6b7280;">← Torna al corso</button>
 </div>
@@ -264,15 +264,13 @@
 
     <script>
         const cardPairs = [
-            { id: 1, emoji: '🗺️', text: 'Art. 25', pair: 'Corruzione e concussione' },
-            { id: 2, emoji: '🏗️', text: 'Art. 25-septies', pair: 'Omicidio e lesioni sul lavoro' },
-            { id: 3, emoji: '📈', text: 'Interesse', pair: 'Scopo ex ante dell\'azione' },
-            { id: 4, emoji: '🎁', text: 'Vantaggio', pair: 'Beneficio effettivo ex post' },
-            { id: 5, emoji: '👔', text: 'Apicale', pair: 'Funzioni di rappresentanza/direzione' },
-            { id: 6, emoji: '👷', text: 'Sottoposto', pair: 'Soggetto sotto direzione/vigilanza' },
-            { id: 7, emoji: '💰', text: 'Sanzione pecuniaria', pair: 'Sistema a quote (max 1.549.370€)' },
-            { id: 8, emoji: '🚫', text: 'Sanzione interdittiva', pair: 'Divieto contrattare con PA' },
-            { id: 9, emoji: '🔒', text: 'Confisca', pair: 'Obbligatoria del profitto del reato' }
+            { id: 1, emoji: '🏗️', text: 'Art. 25-septies', pair: 'Omicidio e lesioni sul lavoro' },
+            { id: 2, emoji: '📈', text: 'Interesse', pair: 'Scopo ex ante dell\'azione' },
+            { id: 3, emoji: '🎁', text: 'Vantaggio', pair: 'Beneficio effettivo ex post' },
+            { id: 4, emoji: '👔', text: 'Apicale', pair: 'Funzioni di rappresentanza/direzione' },
+            { id: 5, emoji: '👷', text: 'Sottoposto', pair: 'Soggetto sotto direzione/vigilanza' },
+            { id: 6, emoji: '🚫', text: 'Sanzione interdittiva', pair: 'Divieto contrattare con PA' },
+            { id: 7, emoji: '🔒', text: 'Confisca', pair: 'Obbligatoria del profitto del reato' }
         ];
 
         let cards = [];
