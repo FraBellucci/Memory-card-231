@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memory Match 231 - Modulo 1</title>
+    
     <style>
         * {
             margin: 0;
@@ -11,17 +12,46 @@
             box-sizing: border-box;
         }
 
+        /* 1. NUOVO CSS PER SCALING: Centra il body e usa l'altezza del viewport */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            /* Centramento del contenuto sulla pagina */
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            margin: 0;
+            overflow: hidden; /* Importante per evitare barre di scorrimento sul body */
+        }
+        
+        /* 2. NUOVO CSS PER SCALING: Definisce l'area di visualizzazione 800x550 */
+        #viewport-800x550 {
+            width: 800px; /* Larghezza target */
+            height: 550px; /* Altezza target */
+            overflow: hidden; /* Tutto ciò che va fuori, viene nascosto */
+            /* Se vuoi un bordo per vederlo: box-shadow: 0 0 15px rgba(0,0,0,0.8); */
+            background-color: transparent; /* Lascia vedere lo sfondo del body */
         }
 
+        /* 3. Il container interno ora definisce la DIMENSIONE ORIGINALE e applica lo SCALING */
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 1200px; /* Larghezza originale di design */
+            height: 700px; /* Altezza originale stimata del gioco completo (regola se necessario) */
+            margin: 0;
+            padding: 20px; /* Il padding originale del body è stato spostato qui */
+            
+            /* TRASFORMAZIONE CHIAVE: Ridimensiona l'intero container */
+            transform: scale(0.667); /* 800 / 1200 = 0.667 */
+            transform-origin: top left; /* Assicura che lo scaling avvenga dall'angolo */
+            
+            /* Il resto del layout del gioco è preservato */
+            position: relative;
         }
+        
+        /* Rimuovi max-width, ora width è fisso a 1200px per il calcolo dello scale */
+        /* .container { max-width: 1200px; margin: 0 auto; } */ 
+        /* Rimuovi padding: 20px dal body, è nel .container ora */
 
         .header {
             background: white;
@@ -75,12 +105,23 @@
             box-shadow: 0 5px 15px rgba(102,126,234,0.4);
         }
 
+        /* 4. MODIFICA: Aumento la griglia per adattarla meglio al 1200px di design */
+        /* Questo è per il layout originale. Lo scaling lo ridimensionerà poi a 800px */
         .game-board {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            /* La griglia si adatta, ma ha un minimo di 200px. */
+            /* Con 6 colonne a 1200px totali, le schede hanno circa 180px */
+            /* Aumentiamo il minmax per occupare meglio lo spazio */
+            grid-template-columns: repeat(6, 1fr); 
             gap: 15px;
             margin-top: 20px;
         }
+        
+        /* Rimuovi la media query (max-width: 768px), non serve più se forziamo a 800px */
+        /* Se vuoi che la griglia abbia 4 colonne per non essere troppo stretta:
+        .game-board { grid-template-columns: repeat(4, 1fr); }
+        ...in tal caso, le schede saranno più grandi (300px di larghezza originale)
+        */
 
         .card {
             border-radius: 12px;
@@ -97,6 +138,8 @@
             position: relative;
         }
 
+        /* ... tutti gli altri stili .card rimangono invariati e vengono ridimensionati ... */
+        
         .card:hover:not(.flipped):not(.matched) {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -211,58 +254,42 @@
             margin-bottom: 20px;
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
-            
-            .game-board {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-            }
-            
-            .card {
-                min-height: 130px;
-                padding: 15px 10px;
-            }
-
-            .card-emoji {
-                font-size: 2.5em;
-            }
-
-            .card-text {
-                font-size: 0.85em;
-            }
-        }
+        /* Rimuoviamo la media query per max-width: 768px, perché il layout è ora forzato. */
+        /* @media (max-width: 768px) { ... } */
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎮 Memory Match 231</h1>
-            <p class="subtitle">Trova le coppie di concetti chiave del D.Lgs. 231/2001</p>
-            
-           <div class="stats">
-    <div class="stat-box">Mosse: <span id="moves">0</span></div>
-    <div class="stat-box">Coppie trovate: <span id="pairs">0</span>/6</div>
-    <button class="reset-btn" onclick="resetGame()">🔄 Nuova Partita</button>
-    <button class="reset-btn" onclick="window.close()" style="background: #6b7280;">← Torna al corso</button>
-</div>
+    
+    <div id="viewport-800x550">
+        
+        <div class="container">
+            <div class="header">
+                <h1>🎮 Memory Match 231</h1>
+                <p class="subtitle">Trova le coppie di concetti chiave del D.Lgs. 231/2001</p>
+                
+                <div class="stats">
+                    <div class="stat-box">Mosse: <span id="moves">0</span></div>
+                    <div class="stat-box">Coppie trovate: <span id="pairs">0</span>/6</div>
+                    <button class="reset-btn" onclick="resetGame()">🔄 Nuova Partita</button>
+                    <button class="reset-btn" onclick="window.close()" style="background: #6b7280;">← Torna al corso</button>
+                </div>
+            </div>
+
+            <div class="game-board" id="gameBoard"></div>
+
+            <div id="victory" class="victory" style="display: none;">
+                <div class="victory-emoji">🎉</div>
+                <h2>Complimenti!</h2>
+                <p style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
+                    Hai completato il gioco in <strong id="finalMoves">0</strong> mosse!
+                </p>
+                <button class="reset-btn" onclick="resetGame()">Gioca ancora</button>
+            </div>
         </div>
+        
+    </div> <script>
+        /* ... IL TUO JAVASCRIPT NON HA BISOGNO DI MODIFICHE ... */
 
-        <div class="game-board" id="gameBoard"></div>
-
-        <div id="victory" class="victory" style="display: none;">
-            <div class="victory-emoji">🎉</div>
-            <h2>Complimenti!</h2>
-            <p style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
-                Hai completato il gioco in <strong id="finalMoves">0</strong> mosse!
-            </p>
-            <button class="reset-btn" onclick="resetGame()">Gioca ancora</button>
-        </div>
-    </div>
-
-    <script>
         const cardPairs = [
             { id: 1, emoji: '🏗️', text: 'Art. 25-septies', pair: 'Omicidio e lesioni sul lavoro' },
             { id: 2, emoji: '📈', text: 'Interesse', pair: 'Scopo ex ante dell\'azione' },
