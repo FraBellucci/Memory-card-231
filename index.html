@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match 231 - Modulo 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: #f0f4ff;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .reset-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card {
+            border-radius: 12px;
+            padding: 25px 15px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .card:hover:not(.flipped):not(.matched) {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .card.hidden {
+            background: linear-gradient(135deg, #10207A 0%, #764ba2 100%);
+        }
+
+        .card.hidden .card-back {
+            display: flex;
+            font-size: 3.5em;
+            color: white;
+        }
+
+        .card.hidden .card-content {
+            display: none;
+        }
+
+        .card.flipped {
+            background: white;
+        }
+
+        .card.flipped .card-back {
+            display: none;
+        }
+
+        .card.flipped .card-content {
+            display: flex;
+        }
+
+        .card.matched {
+            background: #10b981;
+            animation: matchPulse 0.5s;
+        }
+
+        .card.matched .card-back {
+            display: none;
+        }
+
+        .card.matched .card-content {
+            display: flex;
+            color: white;
+        }
+
+        .card-back {
+            display: none;
+        }
+
+        .card-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .card-emoji {
+            font-size: 3.5em;
+            line-height: 1;
+        }
+
+        .card.matched .card-emoji {
+            filter: brightness(0) invert(1);
+        }
+
+        .card-text {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .card.matched .card-text {
+            color: white;
+        }
+
+        @keyframes matchPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .victory {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideDown 0.5s;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .victory h2 {
+            color: #10b981;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .victory-emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .game-board {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .card {
+                min-height: 130px;
+                padding: 15px 10px;
+            }
+
+            .card-emoji {
+                font-size: 2.5em;
+            }
+
+            .card-text {
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Memory Match 231</h1>
+            <p class="subtitle">Trova le coppie di concetti chiave del D.Lgs. 231/2001</p>
+            
+            <div class="stats">
+                <div class="stat-box">Mosse: <span id="moves">0</span></div>
+                <div class="stat-box">Coppie trovate: <span id="pairs">0</span>/9</div>
+                <button class="reset-btn" onclick="resetGame()">🔄 Nuova Partita</button>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard"></div>
+
+        <div id="victory" class="victory" style="display: none;">
+            <div class="victory-emoji">🎉</div>
+            <h2>Complimenti!</h2>
+            <p style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
+                Hai completato il gioco in <strong id="finalMoves">0</strong> mosse!
+            </p>
+            <button class="reset-btn" onclick="resetGame()">Gioca ancora</button>
+        </div>
+    </div>
+
+    <script>
+        const cardPairs = [
+            { id: 1, emoji: '🗺️', text: 'Art. 25', pair: 'Corruzione e concussione' },
+            { id: 2, emoji: '🏗️', text: 'Art. 25-septies', pair: 'Omicidio e lesioni sul lavoro' },
+            { id: 3, emoji: '📈', text: 'Interesse', pair: 'Scopo ex ante dell\'azione' },
+            { id: 4, emoji: '🎁', text: 'Vantaggio', pair: 'Beneficio effettivo ex post' },
+            { id: 5, emoji: '👔', text: 'Apicale', pair: 'Funzioni di rappresentanza/direzione' },
+            { id: 6, emoji: '👷', text: 'Sottoposto', pair: 'Soggetto sotto direzione/vigilanza' },
+            { id: 7, emoji: '💰', text: 'Sanzione pecuniaria', pair: 'Sistema a quote (max 1.549.370€)' },
+            { id: 8, emoji: '🚫', text: 'Sanzione interdittiva', pair: 'Divieto contrattare con PA' },
+            { id: 9, emoji: '🔒', text: 'Confisca', pair: 'Obbligatoria del profitto del reato' }
+        ];
+
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let canFlip = true;
+
+        function initGame() {
+            cards = [];
+            cardPairs.forEach((pair, index) => {
+                cards.push({ 
+                    id: `${index}-a`, 
+                    pairId: index, 
+                    emoji: pair.emoji,
+                    text: pair.text 
+                });
+                cards.push({ 
+                    id: `${index}-b`, 
+                    pairId: index, 
+                    emoji: pair.emoji,
+                    text: pair.pair 
+                });
+            });
+            
+            // Shuffle
+            cards.sort(() => Math.random() - 0.5);
+            
+            renderBoard();
+        }
+
+        function renderBoard() {
+            const board = document.getElementById('gameBoard');
+            board.innerHTML = '';
+            
+            cards.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card hidden';
+                cardEl.dataset.id = card.id;
+                cardEl.dataset.pairId = card.pairId;
+                
+                cardEl.innerHTML = `
+                    <div class="card-back">🎯</div>
+                    <div class="card-content">
+                        <div class="card-emoji">${card.emoji}</div>
+                        <div class="card-text">${card.text}</div>
+                    </div>
+                `;
+                
+                cardEl.onclick = () => flipCard(card.id);
+                board.appendChild(cardEl);
+            });
+        }
+
+        function flipCard(cardId) {
+            if (!canFlip) return;
+            if (flippedCards.includes(cardId)) return;
+            
+            const cardEl = document.querySelector(`[data-id="${cardId}"]`);
+            if (cardEl.classList.contains('matched')) return;
+            
+            cardEl.classList.remove('hidden');
+            cardEl.classList.add('flipped');
+            flippedCards.push(cardId);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('moves').textContent = moves;
+                canFlip = false;
+                
+                setTimeout(checkMatch, 600);
+            }
+        }
+
+        function checkMatch() {
+            const card1 = document.querySelector(`[data-id="${flippedCards[0]}"]`);
+            const card2 = document.querySelector(`[data-id="${flippedCards[1]}"]`);
+            
+            if (card1.dataset.pairId === card2.dataset.pairId) {
+                // Match!
+                card1.classList.remove('flipped');
+                card1.classList.add('matched');
+                card2.classList.remove('flipped');
+                card2.classList.add('matched');
+                
+                matchedPairs++;
+                document.getElementById('pairs').textContent = matchedPairs;
+                
+                if (matchedPairs === cardPairs.length) {
+                    setTimeout(showVictory, 500);
+                }
+            } else {
+                // No match
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card1.classList.add('hidden');
+                    
+                    card2.classList.remove('flipped');
+                    card2.classList.add('hidden');
+                }, 1000);
+            }
+            
+            flippedCards = [];
+            canFlip = true;
+        }
+
+        function showVictory() {
+            document.getElementById('finalMoves').textContent = moves;
+            document.getElementById('victory').style.display = 'block';
+        }
+
+        function resetGame() {
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            canFlip = true;
+            
+            document.getElementById('moves').textContent = '0';
+            document.getElementById('pairs').textContent = '0';
+            document.getElementById('victory').style.display = 'none';
+            
+            initGame();
+        }
+
+        // Start game on load
+        initGame();
+    </script>
+</body>
+</html>
